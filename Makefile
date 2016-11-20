@@ -38,6 +38,7 @@ SIZE = $(CROSS_COMPILE)size
 LIBOPENCM3_DIR = libopencm3
 LIBOPENCM3_LIBDIR = $(LIBOPENCM3_DIR)/lib
 LIBOPENCM3_LIBNAME = opencm3_stm32f4
+LIBOPENCM3_LIBNAME_FULL = $(LIBOPENCM3_LIBDIR)/lib$(LIBOPENCM3_LIBNAME).a
 
 INC =  -I.
 INC += -I$(LIBOPENCM3_DIR)/include
@@ -96,9 +97,17 @@ $(BUILD)/$(TARGET).bin: $(BUILD)/$(TARGET).elf
 $(BUILD)/$(TARGET).dfu: $(BUILD)/$(TARGET).bin
 	$(Q)./dfu.py -b $(FLASH_ADDR):$^ $@
 
+$(LIBOPENCM3_LIBNAME_FULL):
+	git submodule update --init
+	make -C $(LIBOPENCM3_DIR) TARGETS=stm32/f4
+
+# Building the library generates a bunch of header files, so make each object
+# depend on the library to ensure that the headers gets built.
+$(OBJ): $(LIBOPENCM3_LIBNAME_FULL)
+
 $(BUILD)/$(TARGET).elf: $(OBJ)
 	$(ECHO) "LINK $@"
-	$(Q)$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
+	$(Q)$(CC) $(CFLAGS_CORTEX_M4) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
 	$(Q)$(SIZE) $@
 
 stlink: $(BUILD)/$(TARGET).bin
