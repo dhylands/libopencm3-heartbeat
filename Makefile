@@ -42,9 +42,11 @@ LIBOPENCM3_LIBNAME = opencm3_stm32f4
 INC =  -I.
 INC += -I$(LIBOPENCM3_DIR)/include
 
-CFLAGS_CORTEX_M4 = -mthumb -mtune=cortex-m4 -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant -Wdouble-promotion
+CFLAGS_CORTEX_M4 = -mthumb -mtune=cortex-m4 -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant -Wdouble-promotion -Werror
 
-CFLAGS = -DSTM32F4 $(INC) -Wall -ansi -std=gnu99 -nostdlib $(CFLAGS_CORTEX_M4) $(COPT)
+CFLAGS =  -DSTM32F4 $(INC)
+CFLAGS += -Wextra -Wshadow -Wredundant-decls -Wall -Wmissing-prototypes -Wstrict-prototypes
+CFLAGS += -ansi -std=gnu99 -nostdlib $(CFLAGS_CORTEX_M4) $(COPT)
 
 
 #Debugging/Optimization
